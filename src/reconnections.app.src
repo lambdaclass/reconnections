@@ -5,12 +5,13 @@
   {mod, {rc_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    epgsql
    ]},
   {env,[]},
   {modules, []},
-  {maintainers, []},
-  {licenses, []},
-  {links, []},
+  {maintainers, ["LambdaClass"]},
+  {licenses, ["Apache 2.0"]},
+  {links, [{"Github", "https://github.com/lambdaclass/reconnections"}]},
   {build_tools, ["rebar3"]}
  ]}.
