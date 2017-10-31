@@ -14,3 +14,8 @@ services:
     image: fenglc/pgadmin4
     ports:
       - 5050:5050
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
