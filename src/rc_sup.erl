@@ -7,10 +7,7 @@
 
 -behaviour(supervisor).
 
-%% API
 -export([start_link/0]).
-
-%% Supervisor callbacks
 -export([init/1]).
 
 -define(SERVER, ?MODULE).
@@ -31,5 +28,9 @@ init([]) ->
     {rc_pgsql, {rc_pgsql, start_link, []},
      permanent, infinity, worker, [rc_pgsql]
     },
-  Children = [Postgres],
+  Redis =
+    {rc_redis, {rc_redis, start_link, []},
+     permanent, infinity, worker, [rc_redis]
+    },
+  Children = [Postgres, Redis],
   {ok, {{one_for_one, 3, 10}, Children}}.
