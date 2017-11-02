@@ -32,7 +32,8 @@ handle_info(connect, State) ->
     {ok, Pass}     = application:get_env(pgsql, password),
     {ok, Database} = application:get_env(pgsql, database),
     {ok, Timeout}  = application:get_env(pgsql, timeout),
-    epgsql:connect(Host, Username, Pass, [{database, Database}, {timeout, Timeout}]),
+    {ok, Pid} = epgsql:connect(Host, Username, Pass, [{database, Database}, {timeout, Timeout}]),
+    io:format("Postgres connected. ~p~n", [Pid]),
     {noreply, State}
   catch
     Ex:Err ->
