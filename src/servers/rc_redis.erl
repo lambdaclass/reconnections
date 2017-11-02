@@ -1,13 +1,9 @@
-%%%-------------------------------------------------------------------------------------------------
-%% @doc postgres reconnection server.
-%% @end
-%%%-------------------------------------------------------------------------------------------------
--module (rc_pgsql).
+-module (rc_redis).
 
 -behaviour (gen_server).
 
 -export ([start_link/0]).
--export ([init/1, handle_info/2, handle_cast/2, handle_call/3, terminate/2]).
+-export ([init/1, handle_cast/2, handle_call/3, handle_info/2, terminate/2]).
 
 %%==================================================================================================
 %% API functions
@@ -27,20 +23,20 @@ init([]) ->
 
 handle_info(connect, State) ->
   try
-    {ok, Host}     = application:get_env(pgsql, host),
-    {ok, Username} = application:get_env(pgsql, username),
-    {ok, Pass}     = application:get_env(pgsql, password),
-    {ok, Database} = application:get_env(pgsql, database),
-    {ok, Timeout}  = application:get_env(pgsql, timeout),
-    epgsql:connect(Host, Username, Pass, [{database, Database}, {timeout, Timeout}]),
-    {noreply, State}
+    {ok, Host}     = application:get_env(redis, host),
+    {ok, Port}     = application:get_env(redis, port),
+    {ok, Pass}     = application:get_env(redis, password),
+    {ok, Database} = application:get_env(redis, database),
+    {ok, Timeout}  = application:get_env(redis, reconnect_sleep),
+    {ok, C} = eredis:start_link(Host, Port, Database, Pass, Timeout),
+    {noreply, State#{connection => C}}
   catch
     Ex:Err ->
       io:format("Catch Error - ~p:~p~n", [Ex, Err]),
       {noreply, State}
   end;
 handle_info({'EXIT', _From, Reason}, State = #{retries := Retries}) ->
-  io:format("Error trying to connect with postgres~nRetries: ~p~nError:~p~n", [Retries, Reason]),
+  io:format("Error trying to connect with redis~nRetries: ~p~nError:~p~n", [Retries, Reason]),
   erlang:send_after(5000, self(), connect),
   {noreply, State#{retries => Retries + 1}};
 handle_info(_Msg, State) ->
@@ -51,5 +47,5 @@ handle_cast(_Msg, State) -> {noreply, State}.
 handle_call(_Msg, _From, State) -> {noreply, State}.
 
 terminate(Reason, State) ->
-  io:format("Postgres connection server terminate.~nReason: ~p", [Reason]),
+  io:format("Redis connection server terminate.~nReason: ~p", [Reason]),
   {noreply, State}.
