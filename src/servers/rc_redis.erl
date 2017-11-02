@@ -28,8 +28,9 @@ handle_info(connect, State) ->
     {ok, Pass}     = application:get_env(redis, password),
     {ok, Database} = application:get_env(redis, database),
     {ok, Timeout}  = application:get_env(redis, reconnect_sleep),
-    {ok, C} = eredis:start_link(Host, Port, Database, Pass, Timeout),
-    {noreply, State#{connection => C}}
+    {ok, Pid} = eredis:start_link(Host, Port, Database, Pass, Timeout),
+    io:format("Redis connected. ~p~n", [Pid]),
+    {noreply, State#{connection => Pid}}
   catch
     Ex:Err ->
       io:format("Catch Error - ~p:~p~n", [Ex, Err]),
