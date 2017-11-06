@@ -5,16 +5,8 @@
 -export ([start_link/0]).
 -export ([init/1, handle_cast/2, handle_call/3, handle_info/2, terminate/2]).
 
-%%==================================================================================================
-%% API functions
-%%==================================================================================================
-
 start_link() ->
   gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
-
-%%==================================================================================================
-%% Callbacks
-%%==================================================================================================
 
 init([]) ->
   self() ! connect,
@@ -36,10 +28,12 @@ handle_info(connect, State) ->
       io:format("Catch Error - ~p:~p~n", [Ex, Err]),
       {noreply, State}
   end;
+
 handle_info({'EXIT', _From, Reason}, State = #{retries := Retries}) ->
   io:format("Error trying to connect with redis~nRetries: ~p~nError:~p~n", [Retries, Reason]),
   erlang:send_after(5000, self(), connect),
   {noreply, State#{retries => Retries + 1}};
+
 handle_info(_Msg, State) ->
   {noreply, State}.
 

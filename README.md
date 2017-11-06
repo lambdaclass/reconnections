@@ -17,5 +17,6 @@ Behaviour of each service when there are no connection.
 | -------- | --------------------------------- | ------------------------------ | -------------------------------------------- |
 | epgsql   | Send EXIT signal, no reconnect    | Send EXIT signal, no reconnect | noproc _(message to a non existent process)_ |
 | eredis   | Send EXIT signal, no reconnect    | Try to reconnect               | {connection_error, Reason}                   |
+| brod     | Send exit:connection_failure, try to reconnect | Try to reconnect  | - |
 
 In _eredis_ the sleep time between attempts to reconnect can be set with the fifth paremeter `ReconnectSleep` in the `eredis:start_link/5` call.
