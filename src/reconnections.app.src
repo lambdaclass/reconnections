@@ -5,8 +5,7 @@
   {mod, {rc_app, []}},
   {applications,
    [kernel,
-    stdlib,
-    epgsql
+    stdlib
    ]},
   {env,[]},
   {modules, []},
