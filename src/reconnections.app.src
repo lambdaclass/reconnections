@@ -2,10 +2,11 @@
  [{description, "An OTP application"},
   {vsn, "0.1.0"},
   {registered, []},
-  {mod, {rc_app, []}},
+  {mod, {reconnections, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    lager
    ]},
   {env,[]},
   {modules, []},

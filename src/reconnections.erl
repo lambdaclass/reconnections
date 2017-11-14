@@ -1,8 +1,11 @@
--module(rc_app).
+-module(reconnections).
 
 -behaviour(application).
 
--export([start/0, start/2, stop/1]).
+-export([start/0,
+         start/2,
+         stop/1,
+         get/1]).
 
 start() ->
   application:ensure_all_started(reconnections).
@@ -12,3 +15,6 @@ start(_StartType, _StartArgs) ->
 
 stop(_State) ->
   ok.
+
+get(ConnName) ->
+  gen_server:call(ConnName, get_connection).
