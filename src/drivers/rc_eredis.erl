@@ -14,11 +14,7 @@ start_link(Args) ->
 init(Args) ->
   self() ! connect,
   process_flag(trap_exit, true),
-  Defaults = #{host => "127.0.0.1",
-               port => 6379,
-               password => "",
-               database => 0,
-               reconnection => {uniform, 500}},
+  Defaults = default_config(),
   ValidArgs = maps:merge(Defaults, Args),
   State = maps:merge(ValidArgs, #{retries => 0, state => disconnected}),
   {ok, State}.
@@ -62,3 +58,10 @@ handle_call(get_connection, _From, State) ->
 terminate(Reason, State) ->
   lager:info("Redis connection server terminate.~nReason: ~p", [Reason]),
   {noreply, State}.
+
+default_config() ->
+#{host => "127.0.0.1",
+               port => 6379,
+               password => "",
+               database => 0,
+               reconnection => {uniform, 500}}.

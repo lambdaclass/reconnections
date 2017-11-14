@@ -2,13 +2,14 @@
 
 -behaviour(application).
 
--export([start/0,
+-export([start_service/2,
          start/2,
          stop/1,
          get/1]).
 
-start() ->
-  application:ensure_all_started(reconnections).
+-type drivers() :: eredis | epgsql.
+
+-export_type([drivers/0]).
 
 start(_StartType, _StartArgs) ->
   rc_sup:start_link().
@@ -16,5 +17,9 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
   ok.
 
+-spec get(drivers()) -> {ok, pid()} | {error, disconnected}.
 get(ConnName) ->
   gen_server:call(ConnName, get_connection).
+
+start_service(Service, Args) ->
+  rc_sup:start_service(Service, Args).

@@ -2,13 +2,23 @@
 
 -behaviour(supervisor).
 
--export([start_link/0]).
+-export([start_link/0, start_service/2]).
 -export([init/1]).
 
 -define(SERVER, ?MODULE).
 
 start_link() ->
   supervisor:start_link({local, ?SERVER}, ?MODULE, []).
+
+start_service(Service, Args) ->
+  Args2 = Args#{type => Service},
+  Module = driver_module(Args2),
+  case driver_spec(Module, Args2) of
+    {true, ChildSpec} ->
+      supervisor:start_child(?MODULE, ChildSpec);
+    false ->
+      {error, wrong_specification}
+  end.
 
 init([]) ->
   Drivers  = application:get_env(reconnections, drivers, []),
@@ -26,25 +36,14 @@ drivers_specs(Drivers) ->
 
 driver_module(#{type := epgsql}) -> rc_epgsql;
 driver_module(#{type := eredis}) -> rc_eredis;
-driver_module(#{type := Driver}) -> {error, bad_driver_type, Driver};
+driver_module(#{type := Driver}) -> {error, {bad_driver_type, Driver}};
 driver_module(_)                 -> {error, missing_driver}.
 
-driver_spec({error, bad_driver_type, Driver}, _) ->
-  lager:error("Wrong driver type: ~p.", [Driver]),
-  false;
-
-driver_spec({error, missing_driver}, _) ->
-  lager:error("Missing driver type."),
-  false;
-
-driver_spec(Module, #{reconnection := {uniform, _}} = Args) ->
+driver_spec(Module, Args) ->
   {true, #{ id       => Module,
             start    => {Module, start_link, [Args]},
             restart  => permanent,
             shutdown => infinity,
             type     => worker,
             modules  => [Module]
-         }};
-driver_spec(_, #{type := DriverType}) ->
-  lager:error("Missing valid reconnection type in ~p.", [DriverType]),
-  false.
+         }}.
