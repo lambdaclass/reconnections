@@ -1,13 +1,6 @@
 version: '3.1'
 
 services:
-
-  app:
-    image: erlang:20
-    volumes:
-      ".:/opt/reconnections"
-    command: erl -pa /_build/default/lib/*/ebin/ -config /conf/sys
-
   postgres:
     image: postgres
     ports:

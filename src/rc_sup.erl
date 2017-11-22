@@ -15,7 +15,7 @@ start_service(Service, Args) ->
   Module = driver_module(Args2),
   case driver_spec(Module, Args2) of
     {true, ChildSpec} ->
-      supervisor:start_child(?MODULE, ChildSpec);
+      supervisor:start_child(?MODULE, ChildSpec); %TODO modify this response when fails.
     false ->
       {error, wrong_specification}
   end.

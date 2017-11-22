@@ -21,5 +21,6 @@ stop(_State) ->
 get(ConnName) ->
   gen_server:call(ConnName, get_connection).
 
+% -spec start_service(drivers(), map()) -> startchild_ret() | {error, wrong_specification}.
 start_service(Service, Args) ->
   rc_sup:start_service(Service, Args).

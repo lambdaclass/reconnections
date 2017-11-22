@@ -1,0 +1,5 @@
+blockade_id: test
+containers:
+  b5d9d5305ac0: {id: b5d9d5305ac0ae6ebfe0d62eb8eb0727f1322599a457a43d4056946c4241da61}
+  redis: {id: 15751197c3f97ad1151097753f9d4ec622ad1e6878804e921d5efb6fc75455fb}
+version: 1

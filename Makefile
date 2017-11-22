@@ -4,7 +4,7 @@ dev:
 	./rebar3 as dev compile && ./rebar3 as dev shell
 
 test:
-	blockade up
+	rebar3 ct --cover
 
 container_test:
 	./rebar3 as dev ct

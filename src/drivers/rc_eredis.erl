@@ -48,7 +48,7 @@ handle_call(get_connection, _From, #{connection_ref := Pid} = State) ->
   % This is needed because when eredis loses connection does not notify
   case sys:get_state(Pid) of
     {state, _, _, _, _, _, _, undefined, _, _} ->
-      {reply, {error,disconnected}, State#{state => disconnected}};
+      {reply, {error, disconnected}, State#{state => disconnected}};
     {state, _, _, _, _, _, _, _, _, _} ->
       {reply, {ok, Pid}, State#{state => connected}}
   end;
@@ -61,7 +61,7 @@ terminate(Reason, State) ->
 
 default_config() ->
 #{host => "127.0.0.1",
-               port => 6379,
-               password => "",
-               database => 0,
-               reconnection => {uniform, 500}}.
+  port => 6379,
+  password => "",
+  database => 0,
+  reconnection => {uniform, 500}}.

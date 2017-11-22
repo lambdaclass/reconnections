@@ -1,9 +1,0 @@
-{"status": "Success", "timestamp": 1510864472.467213, "message": "", "event": "start", "targets": ["breconnections"]}
-{"status": "Success", "timestamp": 1510866526.654956, "message": "", "event": "start", "targets": ["breconnections"]}
-{"status": "Success", "timestamp": 1510938095.824319, "message": "", "event": "partition", "targets": [["bredis", "bpostgres"], ["breconnections"]]}
-{"status": "Failed", "timestamp": 1510938110.034615, "message": "Partitions contain unknown containers: ['join']", "event": "partition", "targets": ["['join']"]}
-{"status": "Success", "timestamp": 1510938117.119339, "message": "", "event": "join", "targets": []}
-{"status": "Success", "timestamp": 1510938381.976488, "message": "", "event": "partition", "targets": [["bredis", "bpostgres"], ["breconnections"]]}
-{"status": "Success", "timestamp": 1510938404.066899, "message": "", "event": "join", "targets": []}
-{"status": "Success", "timestamp": 1510938781.725402, "message": "", "event": "partition", "targets": [["bredis", "bpostgres"], ["breconnections"]]}
-{"status": "Success", "timestamp": 1510938816.286013, "message": "", "event": "join", "targets": []}
