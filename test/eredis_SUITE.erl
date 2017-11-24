@@ -5,16 +5,17 @@
           end_per_suite/1
         ]).
 -export([ basic/1,
+          service_down/1,
           partitioned_network/1
         ]).
 
 all() ->
-  [basic].
+  [basic, service_down, partitioned_network].
 
 init_per_suite(Config) ->
   application:ensure_all_started(reconnections),
   application:ensure_all_started(blockaderl),
-  
+
   blockaderl:delete("docker.for.mac.localhost", 5000, <<"test">>),
 
   BlockadeContainers = #{
@@ -50,29 +51,29 @@ basic(_Config) ->
   {ok, <<"is working">>} = eredis:q(Pid, ["GET", "state"]),
   ok.
 
-partitioned_network(Config) ->
+service_down(Config) ->
   Host = proplists:get_value(host, Config),
   Port = proplists:get_value(port, Config),
   Name = proplists:get_value(name, Config),
-  % Get state when network status is ok
+  %% Get state when network status is ok
   {ok, Pid} = reconnections:get(eredis),
   {ok, <<"is working">>} = eredis:q(Pid, ["GET", "state"]),
-  % Generate a partition betwen the application and redis
-  % TODO
-  ok = blockaderl:partitions(Host, Port, Name, [[<<"reconnections">>], ["redis"]]),
-  % Get state when network is disconnected
-  % timer:sleep(5000),
+  %% Stop redis
+  ok = blockaderl:containers_stop(Host, Port, Name, [<<"redis">>]),
+
+  %% Get state when service is down
   {error, disconnected} = reconnections:get(eredis),
-  % Set the network configuration normal again
-  ok = blockaderl:delete_partition(Host, Port, Name),
+
+  % restart the service
+  ok = blockaderl:containers_start(Host, Port, Name, [<<"redis">>]),
+
+  %% FIXME this shuold retry with minimal sleep time until it works (or give up after some attempts).
+  %% instead of using long retries
+  timer:sleep(3000),
   % Reconnections get the connection id automatically
   {ok, Pid2} = reconnections:get(eredis),
   {ok, <<"is working">>} = eredis:q(Pid2, ["GET", "state"]),
   ok.
 
-% -spec flaky(config()) -> ok.
-% flaky(_Config) ->
-%   {ok, _, Pid} = test_utils:try_to_connect(eredis, 5),
-%   {ok, <<"OK">>} = eredis:q(Pid, ["SET", "state", "is working"]),
-%   {ok, <<"is working">>} = eredis:q(Pid, ["GET", "state"]),
-%   ok.
+partitioned_network(_Config) ->
+  ok.
