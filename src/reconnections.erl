@@ -2,14 +2,11 @@
 
 -behaviour(application).
 
--export([start_service/2,
-         start/2,
-         stop/1,
-         get/1]).
-
--type drivers() :: eredis | epgsql.
-
--export_type([drivers/0]).
+-export([ start/2,
+          stop/1,
+          start_service/2,
+          stop_service/1,
+          get/1]).
 
 start(_StartType, _StartArgs) ->
   rc_sup:start_link().
@@ -17,10 +14,11 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
   ok.
 
--spec get(drivers()) -> {ok, pid()} | {error, disconnected}.
 get(ConnName) ->
   gen_server:call(ConnName, get_connection).
 
-% -spec start_service(drivers(), map()) -> startchild_ret() | {error, wrong_specification}.
 start_service(Service, Args) ->
   rc_sup:start_service(Service, Args).
+
+stop_service(Service) ->
+  rc_sup:stop_service(Service).

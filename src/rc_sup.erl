@@ -2,7 +2,9 @@
 
 -behaviour(supervisor).
 
--export([start_link/0, start_service/2]).
+-export([ start_link/0,
+          start_service/2,
+          stop_service/1]).
 -export([init/1]).
 
 -define(SERVER, ?MODULE).
@@ -18,6 +20,14 @@ start_service(Service, Args) ->
       supervisor:start_child(?MODULE, ChildSpec); %TODO modify this response when fails.
     false ->
       {error, wrong_specification}
+  end.
+
+stop_service(Service) ->
+  case whereis(Service) of
+    undefined -> undefined;
+    Pid ->
+      exit(Pid, kill),
+      ok
   end.
 
 init([]) ->
