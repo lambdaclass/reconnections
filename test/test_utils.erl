@@ -14,7 +14,7 @@ connect(Driver, Remaining, Retries) ->
     {ok, Pid} ->
       {ok, Retries, Pid};
     {error, Reason} ->
-      lager:info("Error during the connection with redis, reason: ~p~n trying again in a second.",
+      lager:info("Error during the connection with redis, reason: ~p~n trying again.",
                  [Reason]),
       timer:sleep(100),
       connect(Driver, Remaining - 1, Retries + 1)
