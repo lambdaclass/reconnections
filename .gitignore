@@ -17,3 +17,5 @@ _build
 rebar3.crashdump
 ct_log
 .blockade/
+.blockade.out
+.blockade.pid
