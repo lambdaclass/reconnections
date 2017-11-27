@@ -42,10 +42,16 @@ API to manage the connections.
 
 Behaviour of each service when there are no connection.
 
-| Services | Initialization without connection | Loses connection               | Request when no connection                   |
-| -------- | --------------------------------- | ------------------------------ | -------------------------------------------- |
-| epgsql   | Sends EXIT signal, no reconnect    | Sends EXIT signal, no reconnect | noproc _(message to a non existent process)_ |
-| eredis   | Sends EXIT signal, no reconnect    | Tries to reconnect               | {connection_error, Reason}                   |
-| brod     | Sends exit:connection_failure, try to reconnect | Tries to reconnect  | - |
+### eRedis
+
+- On start: If the redis server is not available, eredis fails and doesn't try to reconnect.
+- Disconnection: If there is a disconnection after the connection was correctly established, eredis keeps on trying to reconnect to the server.
+
+### ePgsql
+
+- On start: If the postgresql server is not available, epgsql fails and doesn't try to reconnect.
+- Disconnection: If there is a disconnection after the connection was correctly established, epgsql sends an exit signal to the process that started the connection.
+
+### CQerl
 
 In _eredis_ the sleep time between attempts to reconnect can be set with the fifth paremeter `ReconnectSleep` in the `eredis:start_link/5` call.
