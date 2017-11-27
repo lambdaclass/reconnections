@@ -46,6 +46,7 @@ drivers_specs(Drivers) ->
 
 driver_module(#{type := epgsql}) -> rc_epgsql;
 driver_module(#{type := eredis}) -> rc_eredis;
+driver_module(#{type := cqerl})  -> rc_cqerl;
 driver_module(#{type := Driver}) -> {error, {bad_driver_type, Driver}};
 driver_module(_)                 -> {error, missing_driver}.
 
