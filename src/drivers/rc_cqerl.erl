@@ -9,7 +9,7 @@ start_link(#{name := Name} = Args) ->
   gen_server:start_link({local, Name}, ?MODULE, Args, []);
 
 start_link(Args) ->
-  gen_server:start_link({local, rcqerl}, ?MODULE, Args, []).
+  gen_server:start_link({local, rc_cqerl}, ?MODULE, Args, []).
 
 init(Args) ->
   self() ! connect,
@@ -19,25 +19,17 @@ init(Args) ->
   State = maps:merge(ValidArgs, #{retries => 0, state => disconnected}),
   {ok, State}.
 
-handle_info(connect, #{reconnection := {uniform, _Time}} = State) ->
-  % #{host     := Host,
-  %   port     := Port,
-  %   password := Pass,
-  %   database := Database} = State,
-  %   Addr = lists:concat([Host, ":", Port]),
-  case cqerl:get_client({}) of
-    {ok, {Pid, _} = Conn} ->
-      {noreply, State#{conn_pid => Pid, connection_ref => Conn, state => connected}};
+handle_info(connect, #{reconnection := {uniform, Time}} = State) ->
+  #{host := Host, port := Port} = State,
+  case cqerl:get_client({Host, Port}) of
+    {ok, Conn} ->
+      {noreply, State#{connection_ref => Conn, state => connected}};
     {error, Reason} ->
+      #{retries := Retries} = State,
       lager:info("cassandra connection error: ~p~n", [Reason]),
-      {noreply, State#{state => disconnected}}
+      erlang:send_after(Time, self(), connect),
+      {noreply, State#{retries => Retries + 1, state => disconnected}}
   end;
-
-handle_info({'EXIT', _From, Reason}, #{reconnection := {uniform, Time}} = State) ->
-  #{retries := Retries} = State,
-  lager:info("Error trying to connect with cassandra~nRetries: ~p~nError:~p~n", [Retries, Reason]),
-  erlang:send_after(Time, self(), connect),
-  {noreply, State#{retries => Retries + 1, state => disconnected}};
 
 handle_info(_Msg, State) ->
   {noreply, State}.
@@ -45,13 +37,16 @@ handle_info(_Msg, State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_call(get_connection, _From,  #{conn_pid := Pid} = State) ->
+handle_call(get_connection, _From,  #{connection_ref := Conn, state := connected} = State) ->
+  {Pid, _} = Conn,
   case erlang:process_info(Pid) of
     undefined ->
-      % try to reconnect
-      {reply, {error, disconnected}, State#{state => disconnected}};
+      #{retries := Retries, reconnection := {uniform, Time}} = State,
+      lager:info("Error trying to connect with cassandra~nRetries: ~p~n", [Retries]),
+      erlang:send_after(Time, self(), connect),
+      {reply, {error, disconnected}, State#{retries => Retries + 1, state => disconnected}};
     _ ->
-      {reply, {ok, Pid}, State#{state => connected}}
+      {reply, {ok, Conn}, State}
   end;
 handle_call(get_connection, _From, State) ->
   {reply, {error, disconnected}, State}.
@@ -63,4 +58,4 @@ terminate(Reason, State) ->
 default_config() ->
 #{host => "127.0.0.1",
   port => 9042,
-  reconnection => {uniform, 500}}.
+  reconnection => {uniform, 100}}.

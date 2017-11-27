@@ -28,7 +28,7 @@ init_per_suite(Config) ->
   },
   Host = "docker.for.mac.localhost",
   Port = 5000,
-  Name = "test",
+  Name = "postgres",
   % Create a Postgres container with Blockaderl
   ok = blockaderl:create(Host, Port, Name, BlockadeContainers),
 
