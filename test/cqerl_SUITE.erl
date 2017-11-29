@@ -28,7 +28,7 @@ init_per_suite(Config) ->
   },
   Host = "docker.for.mac.localhost",
   Port = 5000,
-  Name = "cassandra",
+  Name = "test-"++integer_to_list(rand:uniform(10000)),
   % Create a cassandra container with Blockaderl
   ok = blockaderl:create(Host, Port, Name, BlockadeContainers),
   % Get the Host name from the erlang container with the reconnections app
