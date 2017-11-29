@@ -47,6 +47,8 @@ Behaviour of each service when there are no connection.
 - On start: If the redis server is not available, eredis fails and doesn't try to reconnect.
 - Disconnection: If there is a disconnection after the connection was correctly established, eredis keeps on trying to reconnect to the server.
 
+The sleep time between attempts to reconnect can be set with the fifth paremeter `ReconnectSleep` in the `eredis:start_link/5` call.
+
 ### ePgsql
 
 - On start: If the postgresql server is not available, epgsql fails and doesn't try to reconnect.
@@ -54,4 +56,6 @@ Behaviour of each service when there are no connection.
 
 ### CQerl
 
-In _eredis_ the sleep time between attempts to reconnect can be set with the fifth paremeter `ReconnectSleep` in the `eredis:start_link/5` call.
+- On start: If the cassandra server is not available, cqerl fails and doesn't try to reconnect.
+- Disconnection: If there is a disconnection after the connection was correctly established, cqerl
+fails and doesn't try to reconnect, just log the error. Doesn't send an exit signal neither.

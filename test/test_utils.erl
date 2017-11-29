@@ -11,8 +11,8 @@ connect(_, 0, Retries) ->
   {error, Retries, disconnected};
 connect(Driver, Remaining, Retries) ->
   case reconnections:get(Driver) of
-    {ok, Pid} ->
-      {ok, Retries, Pid};
+    {ok, Con} ->
+      {ok, Retries, Con};
     {error, Reason} ->
       lager:info("Error during the connection with redis, reason: ~p~n trying again.",
                  [Reason]),
