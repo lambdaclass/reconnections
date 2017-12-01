@@ -59,3 +59,10 @@ The sleep time between attempts to reconnect can be set with the fifth paremeter
 - On start: If the cassandra server is not available, cqerl fails and doesn't try to reconnect.
 - Disconnection: If there is a disconnection after the connection was correctly established, cqerl
 fails and doesn't try to reconnect, just log the error. Doesn't send an exit signal neither.
+
+## eMysql
+
+- On start: If the mysql server is not available, emysql fails and doesn't try to reconnect.
+- Disconnection: If there is a disconnection after the connection was correctly established, emysql
+fails and doesn't try to reconnect, doesn't show any kind of error, just send an `connection_down` error when a query is requested. (Doesn't send an exit signal neither.)
+- If the service is re established, the queries start to work again.

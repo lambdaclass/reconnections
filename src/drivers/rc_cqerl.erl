@@ -9,6 +9,7 @@ start_link(#{name := Name} = Args) ->
   gen_server:start_link({local, Name}, ?MODULE, Args, []);
 
 start_link(Args) ->
+  % The process is called rc_cqperl because the driver already start a cqerl process
   gen_server:start_link({local, rc_cqerl}, ?MODULE, Args, []).
 
 init(Args) ->
